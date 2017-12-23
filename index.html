@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@import url('https://fonts.googleapis.com/css?family=Lora');
+
+#textarea {
+  display:none;
+}
+
+body {
+  background:url("https://bennettfeely.com/gradients/img/gradient.jpg") no-repeat center center fixed;
+  background-size:cover;
+  font-family: "Lora", sans-serif;
+  text-align:center;
+  color:white;
+}
+.novis {visibility:hidden;}
+#word {
+  font-size: 30px;
+}
+
+#playbtn {
+  background:white;
+  border-radius:10px;
+  padding:10px 20px;
+  border:none;
+  color: #555;
+}
+
+#panel {
+  text-align:left;
+  width:500px;
+}
+</style>
+</head>
+<body>
+<h1>
+Barely Functional Donald Trump.com
+</h1>
+<p>
+Actual transcripts from Donald Trumps speeches, read by a robot. 
+</p>
+<textarea id="textarea" style="width:200px;height:200px;">Look, having nuclear—my uncle was a great professor and scientist and engineer, Dr. John Trump at MIT; good genes, very good genes, OK, very smart, the Wharton School of Finance, very good, very smart—you know, if you’re a conservative Republican, if I were a liberal, if, like, OK, if I ran as a liberal Democrat, they would say I'm one of the smartest people anywhere in the world—it’s true!—but when you're a conservative Republican they try—oh, do they do a number—that’s why I always start off: Went to Wharton, was a good student, went there, went there, did this, built a fortune—you know I have to give my like credentials all the time, because we’re a little disadvantaged—but you look at the nuclear deal, the thing that really bothers me—it would have been so easy, and it’s not as important as these lives are (nuclear is powerful; my uncle explained that to me many, many years ago, the power and that was 35 years ago; he would explain the power of what's going to happen and he was right—who would have thought?), but when you look at what's going on with the four prisoners—now it used to be three, now it’s four—but when it was three and even now, I would have said it's all in the messenger; fellas, and it is fellas because, you know, they don't, they haven’t figured that the women are smarter right now than the men, so, you know, it’s gonna take them about another 150 years—but the Persians are great negotiators, the Iranians are great negotiators, so, and they, they just killed, they just killed us.</textarea><br>
+<input type="button" id="playbtn" value="Play"/><br>
+<div id="word"></div><br><br>
+<div id="panel" style="min-width:300px;word-wrap:break-word;display:inline-block;">
+
+</div>
+
+<script type="text/javascript">
+var utterance = new SpeechSynthesisUtterance();
+var wordIndex = 0;
+var global_words = [];
+utterance.lang = 'en-UK';
+utterance.rate = 1;
+
+var stimmen = window.speechSynthesis.getVoices();
+console.log(stimmen);
+
+
+document.getElementById('playbtn').onclick = function(){
+    var text    = document.getElementById('textarea').value;
+    var words   = text.split(" ");
+    global_words = words;
+    // Draw the text in a div
+    drawTextInPanel(words);
+    spokenTextArray = words;
+    utterance.text = text;
+    speechSynthesis.speak(utterance);
+    this.style.display = "none";
+};
+
+utterance.onboundary = function(event){
+  	var e = document.getElementById('textarea');
+  	var word = getWordAt(e.value,event.charIndex);
+    // Show Speaking word : x
+  	document.getElementById("word").innerHTML = word;
+    //Increase index of span to highlight
+    console.info(global_words[wordIndex]);
+    
+    try{
+    	document.getElementById("word_span_"+wordIndex).style.visibility = "visible";
+    }catch(e){}
+    
+    wordIndex++;
+};
+
+utterance.onend = function(){
+		document.getElementById("word").innerHTML = "";
+    wordIndex = 0;
+    document.getElementById("panel").innerHTML = "";
+};
+
+// Get the word of a string given the string and the index
+function getWordAt(str, pos) {
+    // Perform type conversions.
+    str = String(str);
+    pos = Number(pos) >>> 0;
+
+    // Search for the word's beginning and end.
+    var left = str.slice(0, pos + 1).search(/\S+$/),
+        right = str.slice(pos).search(/\s/);
+
+    // The last word in the string is a special case.
+    if (right < 0) {
+        return str.slice(left);
+    }
+    // Return the word, using the located bounds to extract it from the string.
+    return str.slice(left, right + pos);
+}
+
+function drawTextInPanel(words_array){
+console.log("Dibujado");
+		var panel = document.getElementById("panel");
+  	for(var i = 0;i < words_array.length;i++){
+    	var html = '<span id="word_span_'+i+'" class="novis">'+words_array[i]+'</span>&nbsp;';
+    	panel.innerHTML += html;
+    }
+}
+</script>
+</body>
+</html>
